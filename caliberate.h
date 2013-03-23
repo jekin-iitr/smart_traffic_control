@@ -7,7 +7,6 @@
 #include  <cmath>
 using namespace std;
 #include <opencv2/core/core.hpp>
-//#include <cxcore.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
@@ -19,16 +18,16 @@ using namespace cv;
 #define RED   cvScalar(0,0,255)
 #define GREEN cvScalar(0,255,0)
 #define BLUE  cvScalar(255,0,0)
-#define MAXCARS	50
+#define MAXCARS 50
 // common variables used in both cpp files
-extern CvCapture* capture;
-extern IplImage * frameImg;
-extern IplImage * polygonImg;
-extern uchar* frameData;
+extern VideoCapture capture;
+extern Mat frameImg;
+extern Mat polygonImg;
+extern char* frameData;
 extern CvPoint pts[4];
 extern double polyArea;
 #endif
 
-IplImage* findRoadImage(void);
+Mat findRoadImage(void);
 void calibPolygon(void);
 void calibIntensity(void);
