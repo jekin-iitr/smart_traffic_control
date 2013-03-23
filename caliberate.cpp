@@ -1,9 +1,9 @@
 #include"caliberate.h"
-IplImage* avgImage;	//Road Image
-uchar* avgImageData; //data of road image
+Mat avgImage; //Road Image
+char* avgImageData; //data of road image
 float table[WIDTH_SMALL][HEIGHT_SMALL][NCHANNELS];
 bool isFixed[WIDTH_SMALL][HEIGHT_SMALL];
-IplImage * polygonImg;
+Mat polygonImg;
 int polyPts[4][2]; //four points of polygon
 CvPoint pts[4]; //four points of polygon
 int counter=0 ;
@@ -39,7 +39,7 @@ void calibPolygon(void)
 {
 	//while caliberating polygon, click on four points to select polygon.
 	//If any pixel is chosen wrong keep clicking circularly clockwise to update polygon points
-	polygonImg	 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(polygonImg);	//blackout area out of polygon
+	polygonImg = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(polygonImg);	//blackout area out of polygon
 	cvShowImage("photo_road", avgImage);
 	cvSetMouseCallback("photo_road",my_mouse_callback,(void*) 0);
 	cvWaitKey(0);
@@ -64,7 +64,7 @@ void calibPolygon(void)
 
 void calibIntensity(void)
 {
-	//Find average Image Intensity (just for information)
+	// Find average Image Intensity (just for information)
 	float intensity = 0;
 	int temp;
 	for(int i=0; i<HEIGHT_SMALL; i++)
@@ -82,7 +82,7 @@ void calibIntensity(void)
 IplImage* findRoadImage(void)
 {	
 	avgImage = cvCreateImage( cvSize(WIDTH_SMALL, HEIGHT_SMALL), 8, 3);	//averaged over 100 gray image frames to get gray photo of road only
-	avgImageData = (uchar*)avgImage->imageData;	cvZero(avgImage);
+	avgImageData = (char*)avgImage->imageData;	cvZero(avgImage);
 	IplImage* img1_origSize;
 	IplImage* img1 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	cvZero(img1);
 	IplImage* img2 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img1
@@ -98,10 +98,10 @@ IplImage* findRoadImage(void)
 	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img4);// cvShowImage("4",img4); cvWaitKey(0);
 	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img3);
 	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img2);// cvShowImage("2",img2); cvShowImage("4",img4); cvWaitKey(0);
-	uchar* img1data = (uchar*)img1->imageData;
-	uchar* img2data = (uchar*)img2->imageData;
-	uchar* img3data = (uchar*)img3->imageData;
-	uchar* img4data = (uchar*)img4->imageData;
+	char* img1data = (char*)img1->imageData;
+	char* img2data = (char*)img2->imageData;
+	char* img3data = (char*)img3->imageData;
+	char* img4data = (char*)img4->imageData;
 	int xSamples = 100;
 	int thresh = 3;
 	cvCreateTrackbar("road_thresh", "trackbar", &thresh, 50, 0);
