@@ -22,7 +22,7 @@ void my_mouse_callback(int event, int x, int y, int flags, void* param )
 			{
 				int prevCounter = (counter==0?3:counter-1);
 				cvLine(avgImage, cvPoint(polyPts[prevCounter][0], polyPts[prevCounter][1]), cvPoint(polyPts[counter][0], polyPts[counter][1]), CV_RGB(255,0,0),1,CV_AA);
-				cvShowImage("photo_road", avgImage);
+				imshow("photo_road", avgImage);
 			}
 			firstTime = false;
 		}
@@ -40,7 +40,7 @@ void calibPolygon(void)
 	//while caliberating polygon, click on four points to select polygon.
 	//If any pixel is chosen wrong keep clicking circularly clockwise to update polygon points
 	polygonImg = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(polygonImg);	//blackout area out of polygon
-	cvShowImage("photo_road", avgImage);
+	imshow("photo_road", avgImage);
 	cvSetMouseCallback("photo_road",my_mouse_callback,(void*) 0);
 	cvWaitKey(0);
 
@@ -59,7 +59,7 @@ void calibPolygon(void)
 	polyArea+= fabs(sqrt(s*(s-a)*(s-b)*(s-c)));
 	s = (c+d+e)/2;
 	polyArea+= fabs((double)pow((double)s*(s-c)*(s-d)*(s-e),.5));
-	cvDestroyWindow("photo_road");
+	destroyWindow("photo_road");
 }
 
 void calibIntensity(void)
@@ -95,9 +95,9 @@ IplImage* findRoadImage(void)
 			isFixed[j][i] = false;
 		}
 	}
-	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img4);// cvShowImage("4",img4); cvWaitKey(0);
+	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img4);// imshow("4",img4); cvWaitKey(0);
 	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img3);
-	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img2);// cvShowImage("2",img2); cvShowImage("4",img4); cvWaitKey(0);
+	img1_origSize = cvQueryFrame(capture);	cvResize(img1_origSize, img1); cvCopyImage(img1, img2);// imshow("2",img2); imshow("4",img4); cvWaitKey(0);
 	char* img1data = (char*)img1->imageData;
 	char* img2data = (char*)img2->imageData;
 	char* img3data = (char*)img3->imageData;
@@ -137,7 +137,7 @@ IplImage* findRoadImage(void)
 		cvCopyImage(img3, img4);
 		cvCopyImage(img2, img3);
 		cvCopyImage(img1, img2);
-		cvShowImage("road_image_formation", avgImage);
+		imshow("road_image_formation", avgImage);
 		cvWaitKey(33);
 	}
 	return avgImage;

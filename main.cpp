@@ -12,8 +12,8 @@ int main()
 	capture = cvCaptureFromAVI( "traffic.avi" );	//Video capture from harddisk(.avi) or from camera
 	Mat frameImg_origSize;	//image taken from camera feed in original size
 	frameImg = cvCreateImage(cvSize(WIDTH_SMALL, HEIGHT_SMALL),8,3);	//same image from camera feed but in smaller size for faster calculation
-	cvNamedWindow ( "out"	  , CV_WINDOW_AUTOSIZE);	//window to show output
-	cvNamedWindow ( "trackbar", CV_WINDOW_AUTOSIZE);	//Trackbars to change value of parameters
+	namedWindow ( "out"	  , CV_WINDOW_AUTOSIZE);	//window to show output
+	namedWindow ( "trackbar", CV_WINDOW_AUTOSIZE);	//Trackbars to change value of parameters
 	cvResizeWindow(	"trackbar", 300, 600		  );	//Resizing trackbar window for proper view of all the parameters
 	frameImg_origSize 	= cvQueryFrame( capture );	//Just to know original size of video
 	resize(frameImg_origSize, frameImg);	//Resize original frame into smaller frame for faster calculations
@@ -70,7 +70,7 @@ int main()
 		frameImg_origSize = cvQueryFrame( capture ); //Store image in original size
 		if( !frameImg_origSize ) break; //if there is no frame available (end of buffer); stop.
 		cvResize(frameImg_origSize, frameImg); //resize original image into smaller image for fast calculation
-		cvShowImage("video", frameImg);
+		imshow("video", frameImg);
 		
 		register int X; //temp variable
 		for( int i=0; i<HEIGHT_SMALL; ++i) //iter through whole frame and compare it with image of road; if greater than threshold, it must be a vehicle
@@ -88,11 +88,11 @@ int main()
 		}
 		cvCopyImage(frameImg, finalImage); //final image to show output in it
 		cvAnd(binImage, polygonImg, binImage, 0);	//Quadrilateral Cropping
-		cvShowImage("bin image", binImage);
+		imshow("bin image", binImage);
 		cvDilate(binImage, binImage, 0, dilate1);	//dilate and erode removes noise. cvBlur also removes noise but is slow.
 		cvErode(binImage, binImage, 0, erode1);
 		cvDilate(binImage, binImage, 0, dilate2);
-		cvShowImage("noise removed", binImage);
+		imshow("noise removed", binImage);
 		//////////////////////////////////////////////////////////////////////////
 		cvCopyImage(binImage,g_image); //g_image is passed in cvFindContours
 		CvSeq* contours = NULL; //contour information
@@ -110,7 +110,7 @@ int main()
 			}	--xContours; // xContours = No of cars
 			cout<<"("<<xContours<<") ";
 		}
-		cvShowImage("contour drawing", finalImage);
+		imshow("contour drawing", finalImage);
 		percentArea = (contourArea*100)/polyArea; // May be >100% sometimes due to Dilate which expands the contours
 		cout<<int(percentArea)<<"% ";
 		//////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ int main()
 		cvLine(finalImage, pts[1], pts[2], CV_RGB(0,255,0),1,CV_AA);
 		cvLine(finalImage, pts[2], pts[3], CV_RGB(0,255,0),1,CV_AA);
 		cvLine(finalImage, pts[3], pts[0], CV_RGB(0,255,0),1,CV_AA);
-		cvShowImage( "out", finalImage); // show final output image
+		imshow( "out", finalImage); // show final output image
 		char c = cvWaitKey(33); //waits 33msec before processing next frame
 		if( c == 27 ) break; // if "esc" pressed; exits.
 		if( time(0) >= T+1 )
