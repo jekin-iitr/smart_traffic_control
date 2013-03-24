@@ -39,7 +39,7 @@ void calibPolygon(void)
 {
 	//while caliberating polygon, click on four points to select polygon.
 	//If any pixel is chosen wrong keep clicking circularly clockwise to update polygon points
-	polygonImg = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(polygonImg);	//blackout area out of polygon
+	polygonImg = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(polygonImg);	//blackout area out of polygon
 	imshow("photo_road", avgImage);
 	cvSetMouseCallback("photo_road",my_mouse_callback,(void*) 0);
 	cvWaitKey(0);
@@ -81,13 +81,13 @@ void calibIntensity(void)
 
 IplImage* findRoadImage(void)
 {	
-	avgImage = cvCreateImage( cvSize(WIDTH_SMALL, HEIGHT_SMALL), 8, 3);	//averaged over 100 gray image frames to get gray photo of road only
+	avgImage = cvCreateImage( size(WIDTH_SMALL, HEIGHT_SMALL), 8, 3);	//averaged over 100 gray image frames to get gray photo of road only
 	avgImageData = (char*)avgImage->imageData;	cvZero(avgImage);
 	IplImage* img1_origSize;
-	IplImage* img1 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	cvZero(img1);
-	IplImage* img2 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img1
-	IplImage* img3 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img2
-	IplImage* img4 = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img3
+	IplImage* img1 = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);	cvZero(img1);
+	IplImage* img2 = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img1
+	IplImage* img3 = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img2
+	IplImage* img4 = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);	//previous frame of img3
 	for(int i=0; i<HEIGHT_SMALL; ++i)
 	{
 		for(int j=0; j<WIDTH_SMALL; ++j)

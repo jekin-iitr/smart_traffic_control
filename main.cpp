@@ -11,30 +11,30 @@ int main()
 {
 	capture = cvCaptureFromAVI( "traffic.avi" );	//Video capture from harddisk(.avi) or from camera
 	Mat frameImg_origSize;	//image taken from camera feed in original size
-	frameImg = cvCreateImage(cvSize(WIDTH_SMALL, HEIGHT_SMALL),8,3);	//same image from camera feed but in smaller size for faster calculation
+	frameImg = cvCreateImage(size(WIDTH_SMALL, HEIGHT_SMALL),8,3);	//same image from camera feed but in smaller size for faster calculation
 	namedWindow ( "out"	  , CV_WINDOW_AUTOSIZE);	//window to show output
 	namedWindow ( "trackbar", CV_WINDOW_AUTOSIZE);	//Trackbars to change value of parameters
 	cvResizeWindow(	"trackbar", 300, 600		  );	//Resizing trackbar window for proper view of all the parameters
 	frameImg_origSize 	= cvQueryFrame( capture );	//Just to know original size of video
 	resize(frameImg_origSize, frameImg);	//Resize original frame into smaller frame for faster calculations
-	CvSize origSize = cvGetSize(frameImg_origSize);	//original size
+	size origSize = cvGetSize(frameImg_origSize);	//original size
 	cout<<"ORIG: size = "<<frameImg_origSize->width
 		<<" X "<<frameImg_origSize->height
 		<<" step "<<frameImg_origSize->widthStep
 		<<" nchannels "<<frameImg_origSize->nChannels<<endl;	//print original size: width, height, widthStep, no of channels.
 
-	g_image = cvCreateImage(cvSize(WIDTH_SMALL, HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(g_image);	//Gray image of frameImg
+	g_image = cvCreateImage(size(WIDTH_SMALL, HEIGHT_SMALL),IPL_DEPTH_8U,1);	cvZero(g_image);	//Gray image of frameImg
 	frameData  = (char*)frameImg ->imageData;	//Data of frameImg
 	calibIntensity();	//Average Intensity of all pixels in the image
-	Mat roadImage = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_8U, 3);	//Image of the road (without vehicles)
+	Mat roadImage = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_8U, 3);	//Image of the road (without vehicles)
 	roadImage = findRoadImage();	//Image of the road
 	
 	char* roadImageData = (char*)roadImage->imageData;	//Data of roadImage
 	calibPolygon();	//Polygon caliberation: Select four points of polygon clockwise and press enter
 	cout<<"polyArea = "<<polyArea;	//Area of selected polygon
-	Mat binImage = cvCreateImage(cvSize(WIDTH_SMALL, HEIGHT_SMALL),IPL_DEPTH_8U,1);	//white pixel = cars, black pixel = other than cars
+	Mat binImage = cvCreateImage(size(WIDTH_SMALL, HEIGHT_SMALL),IPL_DEPTH_8U,1);	//white pixel = cars, black pixel = other than cars
 	char* binImageData = (char*)binImage->imageData;	//data of binImage
-	Mat finalImage = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_8U, 3);	//final image to show output
+	Mat finalImage = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_8U, 3);	//final image to show output
 
 	double T = time(0);	//Current time
 	float fps = 0, lastCount = 0;	//frames per second
@@ -43,15 +43,15 @@ int main()
 	cvCreateTrackbar( "Green Threshold", "trackbar", &thresh_g, 255, 0 );	//Threshold for Green color
 	cvCreateTrackbar( "Blue Threshold", "trackbar", &thresh_b, 255, 0 );//Threshold for Blue color
 	int dilate1=1, erode1=2, dilate2=5;	//Dilate and Erode parameters
-	Mat imgA = cvCreateImage(cvSize(WIDTH_SMALL,HEIGHT_SMALL),8,3);//Used for opticalFlow
+	Mat imgA = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);//Used for opticalFlow
 	CvPoint2D32f* cornersA = new CvPoint2D32f[ MAX_CORNERS ];	//Input points for opticalFlow
 	CvPoint2D32f* cornersB = new CvPoint2D32f[ MAX_CORNERS ];	//Output points from opticalFlow
 	cvCopyImage(frameImg,imgA);	//copy from frameImg to imgA
 
 	int win_size = 20;	//parameter for opticalFlow
 	int corner_count = MAX_CORNERS;	//no of points tracked in opticalFlow
-	Mat pyrA = cvCreateImage( cvSize(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_32F, 1 );	//Temp image (opticalFlow)
-	Mat pyrB = cvCreateImage( cvSize(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_32F, 1 );	//Temp image (opticalFlow)
+	Mat pyrA = cvCreateImage( size(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_32F, 1 );	//Temp image (opticalFlow)
+	Mat pyrB = cvCreateImage( size(WIDTH_SMALL,HEIGHT_SMALL), IPL_DEPTH_32F, 1 );	//Temp image (opticalFlow)
 	double distance;	//Length of lines tracked by opticalFlow
 	int maxArrowLength = 100, minArrowLength = 0;	//div by 10 //Max and Min length of the tracked lines
 	int arrowGap = 5;	//distance between consecutive tracking points (opticalFlow)
@@ -133,7 +133,7 @@ int main()
 		else	arrowGap=5;
 		corner_count = xCorners; //no of points to be tracked
 
-		cvCalcOpticalFlowPyrLK(imgA,frameImg,pyrA,pyrB,cornersA,cornersB,corner_count,cvSize( win_size,win_size ),5,features_found,feature_errors,
+		cvCalcOpticalFlowPyrLK(imgA,frameImg,pyrA,pyrB,cornersA,cornersB,corner_count,size( win_size,win_size ),5,features_found,feature_errors,
 			cvTermCriteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3 ),0); //calculates opticalFlow
 		/// imgA = previous image; frameImg = current image; pyrA, pyrB = temp images; cornersA = input points; cornersB = output points; Rest is not important
 			
