@@ -1,7 +1,7 @@
 /************************************************************************/
 /* Common includes for main.cpp and caliberate.cpp                      */
 /************************************************************************/
-// shared variables are declared in this file
+// shared variables are declared in this file.
 #ifndef CALIBERATE_H_
 #define CALIBERATE_H_
 #include  <iostream>
