@@ -39,9 +39,9 @@ int main()
 	double T = time(0);	//Current time
 	float fps = 0, lastCount = 0;	//frames per second
 	int thresh_r = 43, thresh_g = 43, thresh_b = 49;	//Threshold parameters for Red, Green, Blue colors
-	cvCreateTrackbar( "Red Threshold", "trackbar", &thresh_r, 255, 0 );	//Threshold for Red color
-	cvCreateTrackbar( "Green Threshold", "trackbar", &thresh_g, 255, 0 );	//Threshold for Green color
-	cvCreateTrackbar( "Blue Threshold", "trackbar", &thresh_b, 255, 0 );//Threshold for Blue color
+	createTrackbar( "Red Threshold", "trackbar", &thresh_r, 255, 0 );	//Threshold for Red color
+	createTrackbar( "Green Threshold", "trackbar", &thresh_g, 255, 0 );	//Threshold for Green color
+	createTrackbar( "Blue Threshold", "trackbar", &thresh_b, 255, 0 );//Threshold for Blue color
 	int dilate1=1, erode1=2, dilate2=5;	//Dilate and Erode parameters
 	Mat imgA = cvCreateImage(size(WIDTH_SMALL,HEIGHT_SMALL),8,3);//Used for opticalFlow
 	CvPoint2D32f* cornersA = new CvPoint2D32f[ MAX_CORNERS ];	//Input points for opticalFlow
@@ -55,11 +55,11 @@ int main()
 	double distance;	//Length of lines tracked by opticalFlow
 	int maxArrowLength = 100, minArrowLength = 0;	//div by 10 //Max and Min length of the tracked lines
 	int arrowGap = 5;	//distance between consecutive tracking points (opticalFlow)
-	cvCreateTrackbar("max arrow length", "trackbar", &maxArrowLength, 100, 0);	//Manually change max length of tracked lines
-	cvCreateTrackbar("min arrow length", "trackbar", &minArrowLength, 100, 0);	//Manually change min length of tracked lines
-	cvCreateTrackbar("dilate 1","trackbar", &dilate1, 15, 0);	//first dilate
-	cvCreateTrackbar("erode 1","trackbar", &erode1, 15, 0);		//first erode
-	cvCreateTrackbar("dilate 2","trackbar", &dilate2, 15, 0);	//second dilate
+	createTrackbar("max arrow length", "trackbar", &maxArrowLength, 100, 0);	//Manually change max length of tracked lines
+	createTrackbar("min arrow length", "trackbar", &minArrowLength, 100, 0);	//Manually change min length of tracked lines
+	createTrackbar("dilate 1","trackbar", &dilate1, 15, 0);	//first dilate
+	createTrackbar("erode 1","trackbar", &erode1, 15, 0);		//first erode
+	createTrackbar("dilate 2","trackbar", &dilate2, 15, 0);	//second dilate
 	char features_found[ MAX_CORNERS ];	//temp data (opticalFlow)
 	float feature_errors[ MAX_CORNERS ];//temp data (opticalFlow)
 	//////////////////////////////////////////////////////////////////////////
