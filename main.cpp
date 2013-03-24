@@ -1,5 +1,5 @@
-#include  <ctime>	//To calculate FPS using time(0) - returns current time
-#include  "caliberate.h"	//contains functions which are called only once - 1.average brightness 2.Polygon Caliberation 3.Road Image finding
+#include<ctime>	//To calculate FPS using time(0) - returns current time
+#include "caliberate.h"	//contains functions which are called only once - 1.average brightness 2.Polygon Caliberation 3.Road Image finding
 VideoCapture capture;	//The capture class captures video either from harddisk(.avi) or from camera
 Mat frameImg;	//contains every frame of the video
 char* frameData;	//data of frameImg image
