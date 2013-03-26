@@ -4,12 +4,13 @@
 // shared variables are declared in this file.
 #ifndef CALIBERATE_H_
 #define CALIBERATE_H_
-#include  <iostream>
+//#include  <iostream>
 #include  <cmath>
-using namespace std;
-#include <opencv2/core/core.hpp>
+//using namespace std;
+#include<cv.hpp>
+//#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 #define NCHANNELS 3
 #define WIDTH_SMALL 320
@@ -25,10 +26,9 @@ extern VideoCapture capture;
 extern Mat frameImg;
 extern Mat polygonImg;
 extern char* frameData;
-extern CvPoint pts[4];
+extern Point pts[4];
 extern double polyArea;
 #endif
 
 Mat findRoadImage(void);
 void calibPolygon(void);
-void calibIntensity(void);
