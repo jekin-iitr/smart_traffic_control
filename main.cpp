@@ -90,6 +90,12 @@ int main()
 	createTrackbar("dilate 2","trackbar", &dilate2, 15, 0);	//second dilate
 	char features_found[ MAX_CORNERS ];	//temp data (opticalFlow)
 	float feature_errors[ MAX_CORNERS ];//temp data (opticalFlow)
+	Mat dilate1_element = getStructuringElement(MORPH_ELLIPSE , Size(2 * dilate1 + 1, 2 * dilate1 + 1), Point(-1,-1) );
+	Mat erode1_element = getStructuringElement(MORPH_ELLIPSE , Size(2 * erode1 + 1, 2 * erode1 + 1), Point(-1,-1) );
+	Mat dilate2_element = getStructuringElement(MORPH_ELLIPSE , Size(2 * dilate2 + 1, 2 * dilate2 + 1), Point(-1,-1) );
+	vector<Vec4i> hierarchy;
+		vector< vector<Point> > contours;
+		vector<uchar>vstatus; vector<float>verror;
 	//////////////////////////////////////////////////////////////////////////
 	while(true) //Loops till video buffers
 	{
@@ -124,27 +130,101 @@ int main()
 		bitwise_and(binImage, polygonImg, binImage, noArray());	//Quadrilateral Cropping
 
 		imshow("bin image", binImage);
-		dilate(binImage, binImage, 0, Point(-1,-1), dilate1, 0, morphologyDefaultBorderValue());
-		erode(binImage, binImage, 0, Point(-1,-1), erode1, 0, morphologyDefaultBorderValue());
-		dilate(binImage, binImage, 0, Point(-1,-1), dilate2, 0, morphologyDefaultBorderValue());
+		//int dilate1 = 4;
+		
+		dilate(binImage, binImage, dilate1_element);
+		erode(binImage, binImage, erode1_element);
+		dilate(binImage, binImage, dilate2_element);
 		imshow("noise removed", binImage);
 
 		//////////////////////////////////////////////////////////////////////////
 		binImage.copyTo(g_image);
 		
-		vector<Vec4i> hierarchy;
-		vector< vector<Point> > contours;
-		//findContours( g_image, contours, hierarchy, CV_RETR_EXTERNAL  , CV_CHAIN_APPROX_SIMPLE, Point(0, 0) ); 
+		
+		//findContours( g_image, contours, hierarchy, CV_RETR_LIST  , CV_CHAIN_APPROX_SIMPLE, Point(0, 0) ); 
 		/// finds contours. g_image = imput image, g_storage = temp storage, &contours = location where contour info is saved
 		/// CV_RETR_CCOMP = contours are stored as connected component, CV_CHAIN_APPROX_SIMPLE = contour finding method
 		double  percentArea = 0; // % of area occupied by vehicles from the area of polygon
 		double contoursArea = 0;
-		
+
 		cout<<"\ncontour size "<<contours.size()<<endl;
 
 		//vector< vector<Point> >::iterator it;
 		int idx=0;
+		//imshow("gimage",g_image);
 
+		//TODO Uncomment below contour finding code and debug it. First debug contourArea and then drawContours
+		//for(it = contours.begin(); it!= contours.end(); it++)
+		/*
+		for(; idx<contours.size(); idx++)
+		{
+			cout<<"idx = "<<idx;	//idx++;
+			//contoursArea +=   contourArea( Mat( *it )) ;
+			//if( !contours[idx].empty() )	contoursArea += contourArea( Mat( contours[idx] ) );
+			cout<<" area = "<<contoursArea<<endl;
+			Scalar color( rand()&255, rand()&255, rand()&255 );
+			//drawContours(finalImage, contours, idx, color, 1, 8, noArray());
+		}
+		*/
+		
+		//imshow("contour drawing", finalImage);
+
+		//contours.clear();
+		//hierarchy.clear();
+
+		// ---------------------------------------------------------------------------------------------------------------------------
+		int xCorners = 0; //No of points to be tracked by opticalFlow
+		for(int i=0; i<HEIGHT_SMALL; i+=arrowGap) //preparing input points to be tracked
+		{
+			for(int j=0; j<WIDTH_SMALL; j+=arrowGap)
+			{
+				if( xCorners >= MAX_CORNERS-1 ) break; //no of points must not exceed MAX_CORNERS
+				if( binImage.at<uchar>(i,j) == 255 )
+				//if( binImageData[i*WIDTH_SMALL + j] == 255 ) //points must be chosen only on the vehicles (white pixels)
+				{
+					cornersA.push_back(Point2f(i,j));
+					//cornersA[xCorners].x = j;
+					//cornersA[xCorners].y = i;
+					++xCorners;
+				}
+			}
+		}
+		cornersB.reserve(xCorners);
+		//if( percentArea>80.0 || fps<=4 )	arrowGap=15; //reduce point density if processor is loaded
+		//else if( percentArea>40.0 || fps<=7 )	arrowGap=10;
+		//else	arrowGap=5;
+		//x corner_count = xCorners; //no of points to be tracked
+		
+		
+		calcOpticalFlowPyrLK(imgA,frameImg,cornersA,cornersB,vstatus, verror, Size( win_size,win_size ),5,cvTermCriteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3 ),0); //calculates opticalFlow
+		/// imgA = previous image; frameImg = current image; cornersA = input points; cornersB = output points; Rest is not important
+			
+		int xCornersInRange = 1; // No of points which satisfies Min and Max length criteria
+		double avgDist = 0; //average length of tracked lines = average movement of vehicles.
+		for( int i=0; i<xCorners; i++ ) //iterate through all tracking points
+		{
+			distance = dist(cornersA[i], cornersB[i]); //length of tracked lines = magnitude of movement of vehicle
+			//if( distance < maxArrowLength/10 && distance > minArrowLength/10) //only accept points which lies in Min-Max range
+			{
+				++xCornersInRange;
+				avgDist += distance; //add length of all lines
+				line( finalImage, Point(cornersA[i].x,cornersA[i].y), Point(cornersB[i].x,cornersB[i].y) , CV_RGB(0,0,255),1 , CV_AA); //draw all tracking  lines
+			}
+		}
+		avgDist /= xCornersInRange; //average length of lines
+		cout<<avgDist;
+		frameImg.copyTo(imgA);
+		cornersA.clear();
+		cornersB.clear();
+		vstatus.clear();
+		verror.clear();
+		//cvCopyImage(frameImg,imgA); //current image frameImg will be previous image imgA for the next frame
+		//////////////////////////////////////////////////////////////////////////
+		line(finalImage, pts[0], pts[1], CV_RGB(0,255,0),1,CV_AA); //draw polygon in final image (Green)
+		line(finalImage, pts[1], pts[2], CV_RGB(0,255,0),1,CV_AA);
+		line(finalImage, pts[2], pts[3], CV_RGB(0,255,0),1,CV_AA);
+		line(finalImage, pts[3], pts[0], CV_RGB(0,255,0),1,CV_AA);
+		imshow( "out", finalImage); // show final output image
 		waitKey(33);
 	}
 	cout<<"\nFINISH\n";
